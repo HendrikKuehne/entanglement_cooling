@@ -1,0 +1,55 @@
+% Derivatives
+\newcommand{\td}[2]{\dfrac{\mathrm{d}#1}{\mathrm{d}#2}}
+\newcommand{\tdtwo}[2]{\dfrac{\mathrm{d}^2#1}{\mathrm{d}#2^2}}
+\newcommand{\pd}[2]{\dfrac{\partial#1}{\partial#2}}
+\newcommand{\pdtwo}[2]{\dfrac{\partial^2#1}{\partial#2^2}}
+\newcommand{\pdmixed}[3]{\dfrac{\partial^2#1}{\partial#2\partial#3}}
+\newcommand{\pdconst}[3]{\left(\dfrac{\partial#1}{\partial#2}\right)_{#3}}
+\newcommand{\pdconsttwo}[3]{\left(\dfrac{\partial^2#1}{\partial#2^2}\right)_#3}
+\newcommand{\pdmix}[3]{\left(\dfrac{\partial^2#1}{\partial#2\partial#3}\right)}
+\newcommand{\ev}[1]{\langle#1\rangle}
+\newcommand{\vnabla}{\vec{\nabla}}
+
+% Quantum mechanics
+% \newcommand{\ket}[1]{|#1\rangle}
+% \newcommand{\kett}[1]{|#1(t)\rangle}
+% \newcommand{\bra}[1]{\langle#1|}
+% \newcommand{\brat}[1]{\langle#1(t)|}
+% \newcommand{\mean}[1]{\langle#1\rangle}
+% \newcommand{\braket}[2]{\langle#1\big|#2\rangle}
+
+\DeclareMathOperator*{\sumint}{
+	\mathchoice
+  		{\ooalign{$\displaystyle\sum$\cr\hidewidth$\displaystyle\int$\hidewidth\cr}}
+  		{\ooalign{\raisebox{.14\height}{\scalebox{.7}{$\textstyle\sum$}}\cr\hidewidth$\textstyle\int$\hidewidth\cr}}
+  		{\ooalign{\raisebox{.2\height}{\scalebox{.6}{$\scriptstyle\sum$}}\cr$\scriptstyle\int$\cr}}
+  		{\ooalign{\raisebox{.2\height}{\scalebox{.6}{$\scriptstyle\sum$}}\cr$\scriptstyle\int$\cr}}
+}
+
+% Operators
+\newcommand{\x}{\hat{x}}
+\newcommand{\p}{\hat{p}}
+\newcommand{\Lh}{\hat{l}}
+\newcommand{\op}[1]{\hat{#1}}
+\newcommand{\vx}{\hat{\vec{x}}}
+\newcommand{\vp}{\hat{\vec{p}}}
+\newcommand{\vL}{\hat{\vec{L}}}
+% \renewcommand{\nabla}{\vec{\nabla}}
+
+% Roman Functions
+\newcommand{\grad}{\mathrm{grad}\:}
+\renewcommand{\div}{\mathrm{div}\:}
+\newcommand{\rot}{\mathrm{rot}\:}
+\newcommand{\tr}{\mathrm{tr}}
+\renewcommand{\d}{\mathrm{d}}
+\newcommand{\sgn}{\mathrm{sgn}\:}
+\newcommand{\rank}{\mathrm{rank}\:}
+
+% Units
+\DeclareSIUnit\year{a}
+
+% Miscellanious
+\newcommand{\dfk}{\varepsilon_0}
+\newcommand{\vr}{(\vec{r})}
+\newcommand{\vrt}{(\vec{r},t)}
+\newcommand{\mum}{\mu\mathrm{m}}
