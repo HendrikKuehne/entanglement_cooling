@@ -14,5 +14,6 @@ report.pdf
 *.toc
 *.synctex(busy)
 test.py
+test.ipynb
 *.bbl-SAVE-ERROR
 writing/reportNotes.bib
