@@ -82,7 +82,7 @@ class MPS:
             result.append(-np.sum(S2 * np.log(S2)))
         return np.array(result)
 
-    def apply_operator(self,op:np.ndarray,*wires):
+    def apply_operator(self,op:np.ndarray,*wires,eps:float=1e-12,chi_max:int=None):
         """Applies the operator `op` at the given sites."""
         # sanity check
         assert np.allclose(op @ op.conj().T,np.eye(op.shape[0])), "op must be unitary!"
@@ -136,8 +136,14 @@ class MPS:
             psi = np.reshape(psi,(-1,2**(i2 - i1 - i) * chiR))
             U,S,Vh = svd(psi,full_matrices=False)
 
-            # omitting zero SVD values
-            mask = S > 0
+            if chi_max != None:
+                # truncating singular values
+                U = U[:,:chi_max]
+                S = S[:chi_max]
+                Vh = Vh[:chi_max,:]
+
+            # omitting close-to-zero SVD values
+            mask = S > eps
             U = U[:,mask]
             S = S[mask]
             Vh = Vh[mask,:]
