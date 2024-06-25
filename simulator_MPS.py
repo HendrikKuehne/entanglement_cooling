@@ -1,10 +1,9 @@
 import numpy as np
-from scipy.linalg import LinAlgError
 import pickle
 import json
 from itertools import product
 from datetime import datetime
-from lib import ent_heating,MPS,ent_cooling
+from lib import ent_heating_MPS,MPS,ent_cooling_MPS
 
 if __name__ == "__main__":
     # gates in the gate sets
@@ -21,7 +20,7 @@ if __name__ == "__main__":
     beta = 5
 
     # simulation parameters
-    steps_heat = 100
+    steps_heat = 200
     steps_cool = 5000
     realizations = 100
 
@@ -38,13 +37,15 @@ if __name__ == "__main__":
                 "nWires":nWires,
                 "gate_set":gate_set,
                 "nSteps":steps_heat,
+                "chi_max":100,
             },
             "cooling":{
                 "gate_set":gate_set,
                 "nSteps":steps_cool,
                 "beta":beta,
+                "chi_max":100,
             }
-        } for gate_set,nWires in product([("CNOT","H","T"),],[4,6,8,10,12,14,16])]
+        } for gate_set,nWires in product([("CNOT","H","T"),],[14,16])]
     # [("CNOT","H","X"),("CNOT","H","S"),("CNOT","H","T")]
 
     # saving the configuration
@@ -71,15 +72,15 @@ if __name__ == "__main__":
         while iR < kwargs["realizations"]:
             try:
                 # heating
-                psi_heating,singvals = ent_heating(**kwargs["heating"])
+                psi_heating,singvals = ent_heating_MPS(**kwargs["heating"])
                 singvals_heating[:,:,iR] = singvals["Svn"]
 
                 # cooling
-                psi_cooling,singvals = ent_cooling(**kwargs["cooling"],state=psi_heating.copy())
+                psi_cooling,singvals = ent_cooling_MPS(**kwargs["cooling"],state=psi_heating.copy())
                 singvals_cooling[:,:,iR] = singvals["Svn"]
 
                 iR += 1
-            except LinAlgError:
+            except np.linalg.LinAlgError:
                 print(f"    iR = {iR}: LinAlgError; trying again.")
                 continue
 

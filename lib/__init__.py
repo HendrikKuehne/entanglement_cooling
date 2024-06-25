@@ -1,6 +1,7 @@
 """
-Rountines for creating and manipulating MPSs, and the entanglement heating- and cooling algorithms.
+Routines for creating and manipulating MPSs, and the entanglement heating- and cooling algorithms.
 """
 
 from lib.mps import MPS,init_spinup_MPS,init_spinright_MPS
-from lib.heating_cooling import ent_heating,ent_cooling,renyi_entropy
+from lib.heating_cooling import ent_heating_MPS,ent_cooling_MPS,ent_heating_statevec,ent_cooling_statevec
+from lib.utils import vn_entropy,renyi_entropy

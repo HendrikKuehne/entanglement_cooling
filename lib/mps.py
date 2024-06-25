@@ -75,22 +75,22 @@ class MPS:
         """Return the (von-Neumann) entanglement entropy for a bipartition at any of the bonds."""
         result = []
         for i in range(1, self.L):
-            S = self.Ss[i].copy()
+            S = self.Ss[i].copy().real # singular values are real anyways
             S = S[S > 1e-30]  # 0*log(0) should give 0; avoid warnings or NaN by discarding small S
             S2 = S * S
             assert abs(np.linalg.norm(S) - 1.) < 1.e-14
-            result.append(-np.sum(S2 * np.log(S2)))
+            result.append(-np.sum(S2 * np.log2(S2)))
         return np.array(result)
 
     def apply_operator(self,op:np.ndarray,*wires,eps:float=1e-12,chi_max:int=None):
         """Applies the operator `op` at the given sites."""
         # sanity check
-        assert np.allclose(op @ op.conj().T,np.eye(op.shape[0])), "op must be unitary!"
+        assert np.allclose(op @ op.conj().T,np.eye(N=op.shape[0])), "op must be unitary!"
         assert op.shape[0] == op.shape[1], "op must be square!"
 
         if op.shape[0] == 2:
             # we got ourselves a single-qubit gate
-            self.Bs[wires[0]] = np.einsum("ijk,jr->irk",self.Bs[wires[0]],op)
+            self.Bs[wires[0]] = np.einsum("rj,ijk->irk",op,self.Bs[wires[0]])
             return
 
         i1 = wires[0]
@@ -124,7 +124,7 @@ class MPS:
 
         # applying the operator
         n_legs = len(psi.shape)
-        psi = np.tensordot(op,psi,axes=((0,1),(1,-2)))
+        psi = np.tensordot(op,psi,axes=((2,3),(1,-2)))
         new_axes = (2,0) + tuple(range(3,n_legs-1)) + (1,n_legs-1)
         # re-shaping psi (tensordor appends the non-contracted axes of the tensors)
         psi = np.transpose(psi,new_axes)
@@ -134,6 +134,8 @@ class MPS:
         # SVDs to re-establish the physical indices
         for i,iSite in enumerate(np.arange(i1,i2+1)):
             psi = np.reshape(psi,(-1,2**(i2 - i1 - i) * chiR))
+            psi_norm = np.linalg.norm(psi)
+            psi = psi / psi_norm
             U,S,Vh = svd(psi,full_matrices=False)
 
             if chi_max != None:
@@ -148,11 +150,17 @@ class MPS:
             S = S[mask]
             Vh = Vh[mask,:]
 
-            # re-normalizing the singular values
-            norm = np.linalg.norm(S)
+            ## re-normalizing the singular values
+            #norm = np.linalg.norm(S)
+            #
+            #new_Bs += [np.reshape(U,(-1,2,len(S))) * norm,]
+            #new_Ss += [S / norm,]
 
-            new_Bs += [np.reshape(U,(-1,2,len(S))) * norm,]
-            new_Ss += [S / norm,]
+            # re-normalizing the constituent tensors
+            Vh = Vh * psi_norm
+
+            new_Bs += [np.reshape(U,(-1,2,len(S))),]
+            new_Ss += [S,]
 
             psi = Vh
         # absorbing the last S and Vh into the last B
@@ -174,18 +182,18 @@ class MPS:
 
 def init_spinup_MPS(L):
     """Return a product state with all spins up as an MPS"""
-    B = np.zeros([1, 2, 1], np.float64)
+    B = np.zeros(shape=[1, 2, 1])
     B[0, 0, 0] = 1.
-    S = np.ones([1], np.float64)
+    S = np.ones(shape=[1])
     Bs = [B.copy() for i in range(L)]
     Ss = [S.copy() for i in range(L)]
     return MPS(Bs, Ss)
 
 def init_spinright_MPS(L):
     """Return a product state with all spins right as an MPS"""
-    B = np.zeros([1, 2, 1], np.float64)
+    B = np.zeros(shape=[1, 2, 1])
     B[0, :, 0] = np.ones(shape=(2,)) / np.sqrt(2)
-    S = np.ones([1], np.float64)
+    S = np.ones(shape=[1,])
     Bs = [B.copy() for i in range(L)]
     Ss = [S.copy() for i in range(L)]
     return MPS(Bs, Ss)
