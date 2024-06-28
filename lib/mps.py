@@ -31,6 +31,7 @@ class MPS:
         self.L = len(Bs)
 
     def copy(self):
+        """Returns a copy of itself."""
         return MPS([B.copy() for B in self.Bs], [S.copy() for S in self.Ss])
 
     def get_theta1(self, i):
@@ -112,30 +113,21 @@ class MPS:
         op = np.reshape(op,newshape=(2,2,2,2))
 
         # we need to find the wavefunction that spans sites i1 to i2, so we multiply together the MPS in the range [i1,i2]
-        psi = self.Bs[i1]
-        iSite = i1 + 1
-        while iSite <= i2:
-            # contracting with the next bond singular values
-            psi = np.einsum("...jk,k->...jk",psi,self.Ss[iSite])
-            # contracting with the next site tensor
-            psi = np.einsum("...i,ijk->...jk",psi,self.Bs[iSite])
-
-            iSite += 1
+        psi = np.einsum("i,ijk->ijk",self.Ss[i1],self.Bs[i1])
+        for iSite in range(i1+1,i2+1): psi = np.einsum("...i,ijk->...jk",psi,self.Bs[iSite])
 
         # applying the operator
         n_legs = len(psi.shape)
         psi = np.tensordot(op,psi,axes=((2,3),(1,-2)))
         new_axes = (2,0) + tuple(range(3,n_legs-1)) + (1,n_legs-1)
-        # re-shaping psi (tensordor appends the non-contracted axes of the tensors)
+        # re-shaping psi (tensordot appends the non-contracted axes of the tensors)
         psi = np.transpose(psi,new_axes)
 
         new_Bs = []
         new_Ss = []
         # SVDs to re-establish the physical indices
-        for i,iSite in enumerate(np.arange(i1,i2+1)):
+        for i,iSite in enumerate(np.arange(i1,i2)):
             psi = np.reshape(psi,(-1,2**(i2 - i1 - i) * chiR))
-            psi_norm = np.linalg.norm(psi)
-            psi = psi / psi_norm
             U,S,Vh = svd(psi,full_matrices=False)
 
             if chi_max != None:
@@ -150,35 +142,61 @@ class MPS:
             S = S[mask]
             Vh = Vh[mask,:]
 
-            ## re-normalizing the singular values
-            #norm = np.linalg.norm(S)
-            #
-            #new_Bs += [np.reshape(U,(-1,2,len(S))) * norm,]
-            #new_Ss += [S / norm,]
-
-            # re-normalizing the constituent tensors
-            Vh = Vh * psi_norm
-
             new_Bs += [np.reshape(U,(-1,2,len(S))),]
             new_Ss += [S,]
 
-            psi = Vh
-        # absorbing the last S and Vh into the last B
-        new_Bs[-1] = np.einsum("ijk,k,kr->ijr",new_Bs[-1],new_Ss[-1],Vh)
-        new_Ss.pop()
+            psi = Vh.copy()
 
-        # inserting the new bond singular values and site tensors back into the MPS
+        new_Bs += [np.reshape(Vh,(len(S),2,-1)),]
+
+        # mutliplying the S left to B[i1] into new_Bs[0] to preserve the canonical form
+        new_Bs[0] = np.einsum("i,ijk->ijk",1 / self.Ss[i1],new_Bs[0])
+
+        # multiplying the next S into the previous B to preserve the canonical form
+        for i,S in enumerate(new_Ss):
+            new_Bs[i] = np.einsum("ijk,k->ijk",new_Bs[i],S)
+
+        # inserting the new B's and S's back into the MPS
         self.Bs[i1:i2+1] = new_Bs
         self.Ss[i1+1:i2+1] = new_Ss
 
+        return
+
     def uncompress(self) -> np.ndarray:
         """Returns the state represented by the MPS in the computational basis."""
-        psi = np.einsum("i,ijk->ijk",self.Ss[0],self.Bs[0])
+        psi = np.array([1,])
 
-        for i in range(1,self.L):
-            psi = np.einsum("...k,k,kir->...ir",psi,self.Ss[i],self.Bs[i])
+        for i in range(0,self.L):
+            psi = np.einsum("...k,kir->...ir",psi,self.Bs[i])
 
         return np.reshape(psi,(1,-1,1))[0,:,0]
+
+    def check_normalization(self):
+        print("Checking normalization.\n  Norm of complete MPS = {:.3e}".format(np.linalg.norm(self.uncompress())))
+        for i1 in range(self.L):
+            for i2 in range(i1+1,self.L):
+                # finding the wavefunction that spans sites i1 to i2, so we multiply together the MPS in the range [i1,i2]
+                psi = np.einsum("i,ijk->ijk",self.Ss[i1],self.Bs[i1])
+                for iSite in range(i1+1,i2+1): psi = np.einsum("...i,ijk->...jk",psi,self.Bs[iSite])
+
+                if not np.isclose(np.linalg.norm(psi),1):
+                    print("  psi[{},{}] is not normalized! |psi[{},{}]| = {:.3e}".format(i1,i2,i1,i2,np.linalg.norm(psi)))
+
+    def __repr__(self):
+        info = f"MPS over {self.L} sites.\n"
+        info += "    site tensor shapes: "
+        for B in self.Bs: info += (str(B.shape) + " ")
+        info += "\n    bond dimensions: "
+        for S in self.Ss: info += (str(len(S)) + " ")
+        info += "\n    norm: {:.3e}".format(np.linalg.norm(self.uncompress()))
+
+        # diagnosing non-normalized singular values
+        info += "\n    Any bond dimensions not normalized? "
+        for i,S in enumerate(self.Ss):
+            if abs(np.linalg.norm(S) - 1.) > 1.e-14:
+                info += f" bond dimension {i} not normalized. "
+
+        return info
 
 def init_spinup_MPS(L):
     """Return a product state with all spins up as an MPS"""

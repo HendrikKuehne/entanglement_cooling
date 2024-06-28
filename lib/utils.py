@@ -48,7 +48,7 @@ def apply_gate_statevec(state:np.ndarray,gate:np.ndarray,wires:tuple) -> np.ndar
         state = np.transpose(state,indices)
         return state
 
-    else:                           # we got ourselves a two-qubit gate
+    if len(wires) == 2:             # we got ourselves a two-qubit gate
         i1,i2 = wires
         if i2 < i1:
             # since the indices are flipped, we also need to flip the gate
@@ -75,3 +75,36 @@ def apply_gate_statevec(state:np.ndarray,gate:np.ndarray,wires:tuple) -> np.ndar
         return state
 
     return None
+
+def bipartite_split(psi:np.ndarray) -> np.ndarray:
+    """
+    Calculates the singular values for a bipartite split of the state `psi`.
+    """
+    # sanity check
+    assert len(psi.shape) == 1
+    assert np.isclose(np.linalg.norm(psi),1)
+
+    nWires = int(np.log2(len(psi)))
+    nBip = int(nWires/2)
+    C = np.reshape(psi.copy(),newshape=(2**(nBip),2**(nWires - nBip)))
+    U,S,Vh = svd(C,full_matrices=False)
+
+    return S
+
+def level_spacing_spectrum(ent:np.ndarray) -> np.ndarray:
+    """
+    Calculates the level spacing ratio statistic of the schmidt values given in `ent`.
+    The first dimension of `ent` runs over the realizations, the second
+    one runs over the singular values at the bonds.
+    """
+    spacings = ent[:,1:] - ent[:,:-1]
+    
+    ratios = spacings[:,1:] / spacings[:,:-1]
+    # treating each spacing separately to be able to remove 
+    finite_ratios = ()
+
+    for iRatio in range(ratios.shape[1]):
+        tmp = ratios[np.isfinite(ratios[:,iRatio]),iRatio]
+        finite_ratios += (np.mean(tmp),)
+
+    return np.array(finite_ratios)
