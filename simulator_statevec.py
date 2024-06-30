@@ -3,7 +3,7 @@ import pickle
 import json
 from itertools import product
 from datetime import datetime
-from lib import ent_heating_MPS,MPS,ent_cooling_MPS
+from lib import ent_heating_statevec,MPS,ent_cooling_statevec
 
 if __name__ == "__main__":
     # gates in the gate sets
@@ -16,8 +16,8 @@ if __name__ == "__main__":
     }
 
     # physical parameters
-    # nWires = 4
-    beta = 5
+    nWires = 4
+    # beta = 5
 
     # simulation parameters
     steps_heat = 200
@@ -32,21 +32,19 @@ if __name__ == "__main__":
     # defining the arguments
     thermalization_kwargs = [
         {
-            "method":"MPS",
+            "method":"statevec",
             "realizations":realizations,
             "heating":{
                 "nWires":nWires,
                 "gate_set":gate_set,
                 "nSteps":steps_heat,
-                "chi_max":100,
             },
             "cooling":{
                 "gate_set":gate_set,
                 "nSteps":steps_cool,
                 "beta":beta,
-                "chi_max":100,
             }
-        } for gate_set,nWires in product([("CNOT","H","T"),],[14,16])]
+        } for gate_set,beta in product([("CNOT","H","X"),("CNOT","H","S"),("CNOT","H","T")],[1.,2.,3.,4.,5.,6.,7.,8.,9.,10.])]
     # [("CNOT","H","X"),("CNOT","H","S"),("CNOT","H","T")]
 
     # saving the configuration
@@ -73,11 +71,11 @@ if __name__ == "__main__":
         while iR < kwargs["realizations"]:
             try:
                 # heating
-                psi_heating,singvals = ent_heating_MPS(**kwargs["heating"])
+                psi_heating,singvals = ent_heating_statevec(**kwargs["heating"],return_Svn=True)
                 singvals_heating[:,:,iR] = singvals["Svn"]
 
                 # cooling
-                psi_cooling,singvals = ent_cooling_MPS(**kwargs["cooling"],state=psi_heating.copy())
+                psi_cooling,singvals = ent_cooling_statevec(**kwargs["cooling"],state=psi_heating.copy())
                 singvals_cooling[:,:,iR] = singvals["Svn"]
 
                 iR += 1
