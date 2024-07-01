@@ -89,6 +89,11 @@ def ent_heating_statevec(nWires:int,gate_set:tuple,nSteps:int=500,return_Svn:boo
     state[0] = 1
     state = np.reshape(state,newshape=[2 for iWire in range(nWires)])
 
+    # rotating each qubit to create the initial state from the paper
+    RY = lambda phi: np.array([[np.cos(phi/2),(-1)*np.sin(phi/2)],[np.sin(phi/2),np.cos(phi/2)]])
+    for iWire,theta in enumerate(np.random.uniform(low=0,high=np.pi,size=(nWires,))):
+        state = apply_gate_statevec(state,RY(theta),(iWire,))
+
     # defining the random sequence of gates we are going to apply
     gate_indices = np.random.randint(low=0,high=len(gate_set),size=(nSteps))
     """Defines the gate that is applied in each step."""

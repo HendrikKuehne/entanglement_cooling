@@ -97,14 +97,26 @@ def level_spacing_spectrum(ent:np.ndarray) -> np.ndarray:
     The first dimension of `ent` runs over the realizations, the second
     one runs over the singular values at the bonds.
     """
-    spacings = ent[:,1:] - ent[:,:-1]
+    if False:
+        # averaging over the singular values
+        ent_avg = ent.mean(axis=0)
+
+        # sorting the singular values in descending order
+        ent_avg = ent_avg[np.argsort(ent_avg)][::-1]
+
+        spacings = ent_avg[:-1] - ent_avg[1:]
+
+        ratios = spacings[1:] / spacings[:-1]
+        return ratios
     
+    # sorting the singular values in descending order
+    print(np.argsort(ent,axis=1))
+    ent = ent[np.argsort(ent,axis=1)][:,::-1]
+    
+    spacings = ent[:,-1] - ent[:,1:]
     ratios = spacings[:,1:] / spacings[:,:-1]
-    # treating each spacing separately to be able to remove 
-    finite_ratios = ()
 
-    for iRatio in range(ratios.shape[1]):
-        tmp = ratios[np.isfinite(ratios[:,iRatio]),iRatio]
-        finite_ratios += (np.mean(tmp),)
+    # dropping nan or inf
+    ratios = ratios[np.isfinite(ratios)]
 
-    return np.array(finite_ratios)
+    return np.array(ratios)
