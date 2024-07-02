@@ -20,20 +20,21 @@ Each file `*.pickle` contains a dictionary with the following structure:
     "gate_set":tuple[str],
     "psi_heating":np.ndarray,
     "psi_cooling":np.ndarray,
-    "singvals_heating":np.ndarray,
-    "singvals_cooling":np.ndarray,
+    "Svn_heating":np.ndarray,
+    "Svn_cooling":np.ndarray,
 }
 ``
 
-Do watch out, because there is a misnomer here: The dictionaries in `*.pickle` contain keys `singvals_heating` and `singvals_cooling`, these are not the singular values however! These actually contain the entanglement entropies for bipartitions $2^N\mapsto 2^{N_A}\otimes 2^{N-N_A}$.
+* `psi_heating` / `psi_cooling`: The quantum states after the heating or cooling procedure, respectively. Two-dimensional `np.ndarray`, where the first dimension runs over the realizations and the second dimension contains the states themselves.
+* `Svn_heating` / `Svn_cooling`: The von-Neumann entanglement entropies for bipartitions $2^N\mapsto 2^{N_A}\otimes 2^{N-N_A}$ that were recorded during heating or cooling, respectively. Three-dimensional `np.ndarray`, where the first dimension runs over the realizations, the second dimensions runs over the steps of the iterations and the third dimensions runs over the bipartitions.
+
+Every file is named after date and time of the simulation, according to `MM-DD_HH_mm_SS`.
 
 ## Datasets
 
-* Simulated without initial randomized rotation during heating:
-    * `06-29_01-59-54`: Gate sets $`\{\text{CNOT},H,X\}`$, $`\{\text{CNOT},H,S\}`$, $`\{\text{CNOT},H,T\}`$ for $\beta\in [1,10]$
-    * Simulating different numbers of wires:
-        * `06-29_01-54-34`: $`N\in\{4,5,6,7,8,9,10,11,12\}`$, gate set $`\{\text{CNOT},H,X\}`$
-        * `06-29_01-55-08`: $`N\in\{4,5,6,7,8,9,10,11,12\}`$, gate set $`\{\text{CNOT},H,S\}`$
-        * `06-29_01-55-15`: $`N\in\{4,5,6,7,8,9,10,11,12\}`$, gate set $`\{\text{CNOT},H,T\}`$
-
-## A few caveats
+* Testing different values of $\beta$:
+    * `07-02_19-44-30`: $`\beta\in [1,10]`$, gate set in $`\{\text{CNOT},H,X\},\{\text{CNOT},H,S\},\{\text{CNOT},H,T\}`$
+* Simulating different numbers of wires:
+    * `07-02_19-40-49`: $`N\in [4,11]`$, gate set $`\{\text{CNOT},H,X\}`$
+    * `07-02_19-40-58`: $`N\in [4,11]`$, gate set $`\{\text{CNOT},H,S\}`$
+    * `07-02_19-41-03`: $`N\in [4,11]`$, gate set $`\{\text{CNOT},H,T\}`$

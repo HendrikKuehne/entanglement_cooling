@@ -79,15 +79,15 @@ def apply_gate_statevec(state:np.ndarray,gate:np.ndarray,wires:tuple) -> np.ndar
 def bipartite_split(psi:np.ndarray) -> np.ndarray:
     """
     Calculates the singular values for a bipartite split of the state `psi`.
+    State is assumed to be stored in the last dimension of `psi`.
     """
     # sanity check
-    assert len(psi.shape) == 1
-    assert np.isclose(np.linalg.norm(psi),1)
+    assert np.allclose(np.linalg.norm(psi,axis=-1),1)
 
-    nWires = int(np.log2(len(psi)))
+    nWires = int(np.log2(psi.shape[-1]))
     nBip = int(nWires/2)
-    C = np.reshape(psi.copy(),newshape=(2**(nBip),2**(nWires - nBip)))
-    U,S,Vh = svd(C,full_matrices=False)
+    C = np.reshape(psi.copy(),newshape=psi.shape[:-1] + (2**(nBip),2**(nWires - nBip)))
+    U,S,Vh = np.linalg.svd(C,full_matrices=False)
 
     return S
 

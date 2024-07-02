@@ -20,8 +20,8 @@ if __name__ == "__main__":
     # beta = 5
 
     # simulation parameters
-    steps_heat = 200
-    steps_cool = 5000
+    steps_heat = 250
+    steps_cool = 6000
     realizations = 100
 
     # file parameters
@@ -63,20 +63,25 @@ if __name__ == "__main__":
         kwargs["heating"]["gate_set"] = [gate_dict[gate] for gate in kwargs["heating"]["gate_set"]]
         kwargs["cooling"]["gate_set"] = [gate_dict[gate] for gate in kwargs["cooling"]["gate_set"]]
 
-        singvals_heating = np.zeros(shape=(kwargs["heating"]["nSteps"]+1,kwargs["heating"]["nWires"]-1,kwargs["realizations"]))
-        singvals_cooling = np.zeros(shape=(kwargs["cooling"]["nSteps"]+1,kwargs["heating"]["nWires"]-1,kwargs["realizations"]))
+        Svn_heating = np.zeros(shape=(kwargs["realizations"],kwargs["heating"]["nSteps"]+1,kwargs["heating"]["nWires"]-1))
+        Svn_cooling = np.zeros(shape=(kwargs["realizations"],kwargs["cooling"]["nSteps"]+1,kwargs["heating"]["nWires"]-1))
+
+        psi_heating = np.zeros(shape=(kwargs["realizations"],2**kwargs["heating"]["nWires"]),dtype=np.complex128)
+        psi_cooling = np.zeros(shape=(kwargs["realizations"],2**kwargs["heating"]["nWires"]),dtype=np.complex128)
 
         # simulating the thermalization procedure for many realizations
         iR = 0
         while iR < kwargs["realizations"]:
             try:
                 # heating
-                psi_heating,singvals = ent_heating_statevec(**kwargs["heating"],return_Svn=True)
-                singvals_heating[:,:,iR] = singvals["Svn"]
+                psi_heating_,return_dict = ent_heating_statevec(**kwargs["heating"],return_Svn=True)
+                psi_heating[iR,:] = psi_heating_
+                Svn_heating[iR,:,:] = return_dict["Svn"]
 
                 # cooling
-                psi_cooling,singvals = ent_cooling_statevec(**kwargs["cooling"],state=psi_heating.copy())
-                singvals_cooling[:,:,iR] = singvals["Svn"]
+                psi_cooling_,return_dict = ent_cooling_statevec(**kwargs["cooling"],state=psi_heating_.copy())
+                psi_cooling[iR,:] = psi_cooling_
+                Svn_cooling[iR,:,:] = return_dict["Svn"]
 
                 iR += 1
             except np.linalg.LinAlgError:
@@ -89,8 +94,8 @@ if __name__ == "__main__":
         kwargs["cooling"]["state"] = psi_cooling
         kwargs["psi_heating"] = psi_heating
         kwargs["psi_cooling"] = psi_cooling
-        kwargs["singvals_heating"] = singvals_heating.mean(axis=2)
-        kwargs["singvals_cooling"] = singvals_cooling.mean(axis=2)
+        kwargs["Svn_heating"] = Svn_heating
+        kwargs["Svn_cooling"] = Svn_cooling
 
         with open(pfile_name,"ab") as pfile:
             pickle.dump(kwargs,pfile)
