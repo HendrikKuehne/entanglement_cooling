@@ -17,6 +17,20 @@ gate_dict = {
 For a key, the respective value contains the gate as numpy array.
 """
 
+coolable = {
+    ("CNOT","H","Z"):False,
+    ("CNOT","H","X"):False,
+    ("CNOT","H","S"):False,
+    ("CNOT","H","T"):True,
+    ("iSWAP","H","Z"):False,
+    ("iSWAP","H","X"):False,
+    ("iSWAP","H","S"):False,
+    ("iSWAP","H","T"):True,
+}
+"""
+Whether the gate set (key) can be cooled or not.
+"""
+
 def gateset_string(gate_set:tuple) -> str:
     """
     Converts the gateset from the dataset dictionaries into a string that is nice for printing

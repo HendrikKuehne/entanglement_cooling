@@ -91,32 +91,19 @@ def bipartite_split(psi:np.ndarray) -> np.ndarray:
 
     return S
 
-def level_spacing_spectrum(ent:np.ndarray) -> np.ndarray:
+def level_spacing(singvals:np.ndarray) -> np.ndarray:
     """
-    Calculates the level spacing ratio statistic of the schmidt values given in `ent`.
-    The first dimension of `ent` runs over the realizations, the second
-    one runs over the singular values at the bonds.
+    Calculates the spacings of consecutive singular values. The singular values of
+    one state are assumed to be stored in the last dimension of `singvals`.
+
+    The returned array has the same leading dimension sizes, but it's last dimension
+    is one entry smaller.
     """
-    if False:
-        # averaging over the singular values
-        ent_avg = ent.mean(axis=0)
+    # sorting in descending order
+    mask = np.argsort(singvals,axis=-1)
+    singvals_ordered = np.take_along_axis(singvals,mask,axis=-1)[:,::-1]
 
-        # sorting the singular values in descending order
-        ent_avg = ent_avg[np.argsort(ent_avg)][::-1]
+    # calculating the spacings
+    spacings = singvals[...,:-1] - singvals[...,1:]
 
-        spacings = ent_avg[:-1] - ent_avg[1:]
-
-        ratios = spacings[1:] / spacings[:-1]
-        return ratios
-    
-    # sorting the singular values in descending order
-    print(np.argsort(ent,axis=1))
-    ent = ent[np.argsort(ent,axis=1)][:,::-1]
-    
-    spacings = ent[:,-1] - ent[:,1:]
-    ratios = spacings[:,1:] / spacings[:,:-1]
-
-    # dropping nan or inf
-    ratios = ratios[np.isfinite(ratios)]
-
-    return np.array(ratios)
+    return spacings
