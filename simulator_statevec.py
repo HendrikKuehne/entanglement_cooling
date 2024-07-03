@@ -3,21 +3,12 @@ import pickle
 import json
 from itertools import product
 from datetime import datetime
-from lib import ent_heating_statevec,MPS,ent_cooling_statevec
+from lib import ent_heating_statevec,ent_cooling_statevec,gate_dict
 
 if __name__ == "__main__":
-    # gates in the gate sets
-    gate_dict = {
-        "X":np.array([[0,1],[1,0]]),
-        "H":np.array([[1,1],[1,-1]]) / np.sqrt(2),
-        "T":np.array([[1,0],[0,np.exp(1j * np.pi / 4)]]),
-        "S":np.array([[1,0],[0,1j]]),
-        "CNOT":np.array([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]]),
-    }
-
     # physical parameters
-    nWires = 4
-    # beta = 5
+    # nWires = 4
+    beta = 5
 
     # simulation parameters
     steps_heat = 250
@@ -44,7 +35,7 @@ if __name__ == "__main__":
                 "nSteps":steps_cool,
                 "beta":beta,
             }
-        } for gate_set,beta in product([("CNOT","H","X"),("CNOT","H","S"),("CNOT","H","T")],[1.,2.,3.,4.,5.,6.,7.,8.,9.,10.])]
+        } for gate_set,nWires in product([("iSWAP","H","Z"),("iSWAP","H","X"),("iSWAP","H","S"),("iSWAP","H","T")],[4,5,6,7,8,9,10,11])]
     # [("CNOT","H","X"),("CNOT","H","S"),("CNOT","H","T")]
 
     # saving the configuration
@@ -58,8 +49,9 @@ if __name__ == "__main__":
     for iKw,kwargs in enumerate(thermalization_kwargs):
         print(f"----- set {iKw+1} / {len(thermalization_kwargs)} of kwargs -----")
 
-        # gate names to gates
+        # saving the gate in string format
         kwargs["gate_set"] = kwargs["heating"]["gate_set"]
+        # gate names to gates
         kwargs["heating"]["gate_set"] = [gate_dict[gate] for gate in kwargs["heating"]["gate_set"]]
         kwargs["cooling"]["gate_set"] = [gate_dict[gate] for gate in kwargs["cooling"]["gate_set"]]
 

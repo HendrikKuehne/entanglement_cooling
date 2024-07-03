@@ -17,3 +17,4 @@ test.py
 test.ipynb
 *.bbl-SAVE-ERROR
 writing/reportNotes.bib
+*.pickle

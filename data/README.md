@@ -8,12 +8,12 @@ Each file `*.pickle` contains a dictionary with the following structure:
 {
     "heating":{
         "nWires":int,
-        "gate_set":tuple[str],
+        "gate_set":tuple[np.ndarray],
         "nSteps":int,
     },
     "cooling":{
         "state":np.ndarray,
-        "gate_set":tuple[str],
+        "gate_set":tuple[np.ndarray],
         "nSteps":int,
         "beta":float,
     }
@@ -35,6 +35,10 @@ Every file is named after date and time of the simulation, according to `MM-DD_H
 * Testing different values of $\beta$:
     * `07-02_19-44-30`: $`\beta\in [1,10]`$, gate set in $`\{\text{CNOT},H,X\},\{\text{CNOT},H,S\},\{\text{CNOT},H,T\}`$
 * Simulating different numbers of wires:
+    * Unmentioned keywords all the following simulations: `kwargs={"heating":{"nSteps":250,},"cooling":{"nSteps":6000,"beta":5.}}`
+    * `07-02_22-30-12`: $`N\in [4,11]`$, gate set $`\{\text{CNOT},H,Z\}`$
     * `07-02_19-40-49`: $`N\in [4,11]`$, gate set $`\{\text{CNOT},H,X\}`$
     * `07-02_19-40-58`: $`N\in [4,11]`$, gate set $`\{\text{CNOT},H,S\}`$
     * `07-02_19-41-03`: $`N\in [4,11]`$, gate set $`\{\text{CNOT},H,T\}`$
+    * `07-02_22-33-21`: $`N\in [4,11]`$, gate set $`\{\text{SWAP},H,Z\},\{\text{SWAP},H,X\},\{\text{SWAP},H,S\},\{\text{SWAP},H,T\}`$
+    * `07-02_22-33-37`: $`N\in [4,11]`$, gate set $`\{\text{iSWAP},H,Z\},\{\text{iSWAP},H,X\},\{\text{iSWAP},H,S\},\{\text{iSWAP},H,T\}`$
