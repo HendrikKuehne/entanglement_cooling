@@ -10,7 +10,6 @@
 *.synctex.gz
 *.fls
 *.fdb_latexmk
-report.pdf
 *.toc
 *.synctex(busy)
 test.py

@@ -4,7 +4,6 @@
 \usepackage{dcolumn}% Align table columns on decimal point
 \usepackage{bm}% bold math
 \usepackage{xcolor}
-%\usepackage[backend=biber]{biblatex}
 \usepackage{listings} % insert code fragments
 \usepackage{braket}
 \usepackage{quantikz}
@@ -47,10 +46,12 @@
     \begin{abstract}
         We show that irreversibility emerges from microscopically reversible dynamics in the entanglement
         and subsequent disentanglement of quantum states. To this end, we entangle an initial random quantum state
-        using gates chosen randomly from a set of gates, and try to disentangle them with a metropolis-like
+        using gates chosen randomly from a set of gates, and try to disentangle it with a Metropolis-inspired
         algorithm. The emergent dynamics do not depend on the particular choice of the set of gates, but only
         on whether the chosen gate set is universal or not. Furthermore, we show that the spacing of consecutive
-        singular values reveals if the disentanglement procedure succeeds or not. This is an example of Loschmidt's
+        singular values reveals if the disentanglement procedure succeeds or not: Universal gate sets induce spacings
+        that follow the Gaussian Orthonormal Ensemble spacings, while non-universal gate sets induce Poisson-like
+        distributed spacings. This is an example of Loschmidt's
         Paradox in quantum systems, revealing the universal tension between microscopically reversible dynamics
         and macroscopic irreversibility.
     \end{abstract}
@@ -66,15 +67,15 @@
     in nature, yet macroscopic dynamics can be irreversible, as is set in stone most famously by the second law
     of thermodynamics.
 
-    Recently, this question has been approaches using Quantum Mechanics and, more specifically, the theory of
-    entanglement \cite{Shaffer:2014:IrreversibilityAndEntanglement,Odavic:2023:RandomUnitaries,Chamon:2014:EmergentIrreversibility}.
+    Recently, this question has been approached using Quantum Mechanics and, more specifically, entanglement
+    \cite{Shaffer:2014:IrreversibilityAndEntanglement,Odavic:2023:RandomUnitaries,Chamon:2014:EmergentIrreversibility}.
     The question of irreversibility seems even less tractable in Quantum Mechanics; all dynamics are unitary and
     thus reversible. Non-unitary dynamics occur only when considering, e.g. quantum channels, which model unitary
     dynamics from the perspective of a subsystem. Subsystems experience the non-classical phenomenon of entanglement
     among each other, making this a natural entry point for irreversibility to be introduced into Quantum Mechanics.
 
     In this work, we show how the creation of entanglement is irreversible in the sense that random dynamics cannot,
-    under certain conditions, disentangle the systems in question. The paper is structured as follows: We introduce
+    under certain conditions, disentangle the systems under consideration. The paper is structured as follows: We introduce
     the formalism of entanglement and the algorithm in Section~\ref{sec:theory}. Afterwards, we give details on
     the simulations we carried out in Section~\ref{sec:simulation}. Our results are discussed in Section~\ref{sec:results}.
 
@@ -84,11 +85,11 @@
     Quantum Mechanics offers many phenomena that are thoroughly non-classical, most notably entanglement. The term
     ``entanglement'' refers to a phenomenon where the state of one system cannot be fully described without knowledge
     of another system; we say that the two systems are ``entangled''. Consider the Hilbert space $\mathcal{H}$,
-    and states $\rho\in\mathbb{C}^{2^N\times 2^N}$ therein. The full Hilbert space may be partitioned into two spaces
+    and states $\rho$ therein. The full Hilbert space may be partitioned into two spaces
     $\mathcal{H}=\mathcal{H}_A\otimes\mathcal{H}_B$. The state on subsystem $A$ then becomes
 
     \begin{equation}
-        \rho\mapsto\text{tr}_B\rho\equiv \rho_A,
+        \rho\mapsto\text{tr}_B\rho\equiv \rho_A.
         \label{theory:eq:reduced_state}
     \end{equation}
 
@@ -101,7 +102,7 @@
         \label{theory:eq:separable_state}
     \end{equation}
 
-    we call $\rho$ a ``separable state''. In both cases, there is no entanglement present in the syste, since we are
+    we call $\rho$ a ``separable state''. In both cases, there is no entanglement present in the system, since we are
     able to express the state using objects that live in only one of the subsystems. If on the other
     hand, $\rho$ is not a product state, i.e. there are no $\rho_A^{(i)}$, $\rho_B^{(i)}$ s.t. Equation~\ref{theory:eq:separable_state}
     holds, then we say $\rho$ is ``entangled''. This means that $\rho$ cannot be fully characterized from the two
@@ -134,14 +135,14 @@
     Let us now consider states of $N$ qubits, such that the Hilbert space is $\mathcal{H}=\mathbb{C}^{2^N}$. The state of this system may be changed by applying unitary transformations
     $U:\mathbb{C}^{2^N}\rightarrow\mathbb{C}^{2^N}$. We refer to these as ``gates'', in analogy to classical
     computing. Gates may act on an arbitrary number of qubits. Gates that act on more than one qubit can create
-    entanglement, while single-qubit gates do not change the entanglement that is present in the whole system.
+    entanglement, while single-qubit gates do not change the entanglement that is present in the system.
     The irreversibility-paradox in Quantum Mechanics comes to be since transformations $U$ of quantum states are
     unitary, and thus reversible. Since entanglement can be created, it can thus also be destroyed.
 
     \vspace{\baselineskip}
 
-    In this work we investigate the possibility of entanglement being created and then destroyed by application of
-    random gates. The first step consists of creating entanglement. Strating from a random product state
+    In this work we investigate the possibility of entanglement being created and then destroyed by
+    random quantum circuits. The first step consists of creating entanglement. Starting from a random product state
 
     \begin{equation}
         \ket{\psi}=\ket{\psi}_0\otimes...\otimes\ket{\psi}_{N-1},
@@ -157,9 +158,9 @@
         \label{theory:eq:bipartition}
     \end{equation}
 
-    into two systems of $N_A$ and $N-N_A$ qubits, respectively. We thus create a random quantum state, which we can
+    into two systems of $N_A$ and $N-N_A$ (consecutive) qubits, respectively. This iterative procedure creates a random quantum state, which we can
     expect to be highly entangled with high probability \cite{Page:1993:AverageEntropy,Hamma:2012:RandomQuantumEntanglement}.
-    After entanglement has been created, we try to disentangle the state using a Metropolis-lie algorithm
+    After entanglement has been created, we try to disentangle the state using a Metropolis-inpired algorithm
     \cite{Shaffer:2014:IrreversibilityAndEntanglement,Odavic:2023:RandomUnitaries,Chamon:2014:EmergentIrreversibility}:
     In every iteration, we choose again a random gate $U\in\mathcal{I}$ from the same set of gates, and apply it to
     a random set of qubits. In doing this we obtain the new state $\ket{\psi^{(j+1)}}=U\ket{\psi^{(j)}}$. We measure
@@ -177,21 +178,21 @@
 
     where $\beta$ plays the role of an inverse temperature. Emphasizing the similarity to the Metropolis algorithm
     \cite{Metropolis:1953:EquationsOfState}, we call this second step ``entanglement cooling''. Conversely,
-    the first setp is referred to as ``entanglement heating''.
+    the first step is referred to as ``entanglement heating''.
 
     \section{Heating and Cooling simulations}
     \label{sec:simulation}
 
     In this section, we give details on the numerical simulation of the heating and cooling steps.
-    In both steps, we simulate the full statevector $\ket{\psi}\in\mathbb{C}^{2^N}$.
+    In both steps, we simulate quantum states $\ket{\psi}$ as full statevectors $\ket{\psi}\in\mathbb{C}^{2^N}$.
 
     \vspace{\baselineskip}
 
     \subsection{Entanglement heating}
     \label{sec:simulation:heating}
 
-    We simulate the statevector As is customary in quantum computing, the initial state is $\ket{0}^{\otimes N}$.
-    We create a random product state by applying the rotation gate
+    As per convention in Quantum Computing, the initial state is $\ket{0}^{\otimes N}$.
+    A random product state is created by applying the rotation gate
 
     \begin{equation}
         R_Y(\theta) = e^{-i\theta Y/2} \doteq \left(\begin{array}{cc}
@@ -222,17 +223,17 @@
             \qw & \swap[partial swap={i},label style={scale=2}]{1} & \midstick[2,brackets=none]{=} & \gate{S} & \gate{H} & \ctrl{1} & \targ{}   & \qw      \\
             \qw & \targX{}                   &                               & \gate{S} & \qw      & \targ{}  & \ctrl{-1} & \gate{H}
         \end{quantikz}
-        \caption{The universality of $\{\text{iSWAP},H,T\}$ is given by the circuit identity above. Recall also
+        \caption{The $\text{iSWAP}$ gate is reducible to $H$, $S$ and $\text{CNOT}$ using the circuit identity above. Recall also
         that $S=T^2$, so the universality of $\{\text{iSWAP},H,T\}$ follows from the universality of $\{\text{CNOT},H,T\}$.}
         \label{simulation:fig:iSWAP}
     \end{figure}
 
-    We apply $R_{\text{heat}}=250$ gates during the heating procedure.
+    We apply $R_{\text{heat}}=250$ gates during the heating procedure. This gives a highly entangled state $\ket{\psi_{\text{heat}}}$.
 
     \subsection{Entanglement cooling}
     \label{sec:simulation:cooling}
 
-    The entanglement cooling step starts with the state that the heating step terminated in. On this
+    The entanglement cooling step starts with the state $\ket{\psi_{\text{heat}}}$ that the heating step terminated in. On this
     state, we again apply a random gate $U\in\mathcal{I}$ from the gate set that was used in the heating step,
     again on a random set of qubits. The new state is only accepted if the mean entanglement decreases, or with
     the probability given in Equation~\ref{theory:eq:metropolis_update}. This is repeated for $R_{\text{cool}}=6000$
@@ -240,48 +241,59 @@
 
     \vspace{\baselineskip}
 
-    We repeat heating and cooling $100$ times and average over the results. The number $N$ of qubits was taken from
-    $[4,11]$ and the (inverse) temperature is $\beta=5$, if not stated otherwise.
+    We repeat heating and cooling $100$ times and average over the results. The number $N$ of qubits was chosen as
+    $N\in [4,11]$ and the (inverse) temperature is $\beta=5$, if not stated otherwise.
 
     \section{Results}
     \label{sec:results}
 
-    The heating step occurs very consistently across different realizations. The entanglement of states with different
-    sizes $N$ grows with the same rate, before individual system sizes converge to their maximum entanglement. The maximum
-    entanglement we reach during the heating step is proortional to $N$:
+    The heating rate is consistent across different realizations, with negligible deviations. The entanglement of states with different
+    sizes $N$ grows with the same rate, before individual system sizes converge to their maximum entanglement. An
+    explanation for the comparable rates of entanglement creation is rooted in the fact that we are using two-qubit gates
+    to create entanglement. A two-qubit gate can only create entanglement between the two qubits it is applied to, and
+    the entanglement in such a system is limited to $S\leq\log_2d=2$. Thus, no matter the system size, the gates we use
+    create entanglement at the same rate.
+
+    The maximum entanglement we reach during the heating step is proportional to $N$:
 
     \begin{equation}
-        \text{max}\braket{S_{N_A}} \propto N.
+        \max_{N_A}\braket{S_{N_A}} \propto N.
     \end{equation}
 
-    This is in line with the known sacling $S\propto \log_2d$ \cite{Page:1993:AverageEntropy} of the entropy of a random
-    quantum state, where $d$ is the dimension of the local Hilbert space (recall that here, $d=2^{N_1}$). The rate of entanglement
+    This is in line with the known scaling $S\propto \log_2d$ \cite{Page:1993:AverageEntropy} of the entropy of a random
+    quantum state, where $d$ is the dimension of the local Hilbert space (recall that here, $d=2^{N_A}$). The rate of entanglement
     creation is slightly smaller for gate sets that contain the $\text{iSWAP}$ gate, but maximum entanglement values are
     equal. See also Figure~\ref{results:fig:therm_examples}.
 
     \vspace{\baselineskip}
 
-    The entanglement cooling step does not depend on the value of $\beta$; for $\beta\in [1,10]$, cooling occurs at the
+    The entanglement cooling rate does not depend on the value of $\beta$; for $\beta\in [1,10]$, cooling occurs at the
     same rate. See Figure~\ref{results:fig:betatest}.
 
     \begin{figure}[htb]
         \includegraphics[width=\columnwidth]{plots/betatest_{CNOT,H,X}_CNOT.pdf}
         \caption{We simulated entanglement cooling for $\beta\in [1,10]$ in a system of four qubits ($N=4$) and the gate
-        sets $\{\text{CNOT},H,X\}$,$\{\text{CNOT},H,S\}$, and $\{\text{CNOT},H,T\}$. There is no difference in the cooling
+        sets $\{\text{CNOT},H,X\}$, $\{\text{CNOT},H,S\}$ and $\{\text{CNOT},H,T\}$. There is no difference in the cooling
         rate, as is shown above for one particular gate set.}
         \label{results:fig:betatest}
     \end{figure}
 
-    We move on now to the central result of this work, which concerns irreversibility: The entanglement cooling step
+    We move on to the central result of this work, which concerns irreversibility: The entanglement cooling step
     does not always succeed. If the creation of entanglement were reversible, cooling would always be able to lower
-    the entanglement back (or close to) zero; this is not the case, however. Specifically, entanglement cooling fails,
-    whenever the gate set that is used is universal. Entanglement cooling occurs at the same rate regardless of system
-    size $N$ and whether it succeeds or fails, however disentangling begins later during the cooling process for larger
-    systems. See also Figure~\ref{results:fig:therm_spped_iSWAP}.
+    the entanglement back (or close to) zero\footnote{Where disentangling succeeds, there remain differences in how
+    much entanglement the cooling step is able to remove from the state. The gate sets that contain $\text{CNOT}$ are
+    able to fully disentangle the state in question. The sets containing $\text{iSWAP}$ are able to remove a
+    significant amount of entanglement, however, they cannot reduce $S$ back to zero. See
+    Figure~\ref{results:fig:therm_CNOT_vs_iSWAP}.}; this is not the case, however. Specifically, entanglement cooling fails,
+    whenever the gate set that is used is universal. Disentangling occurs at the same rate regardless of system
+    size $N$ and whether it succeeds or fails, for the same reason that entanglement heating occurs at the same rate.
+    Disentangling begins later during the cooling process for larger systems. See also Figure~\ref{results:fig:therm_spped_iSWAP}.
 
     \begin{figure}[htb]
         \includegraphics[width=\columnwidth]{plots/therm_speed_iSWAP.pdf}
-        \caption{The entanglement cooling process for gate sets that contain an $\text{iSWAP}$ gate. The rate of disentangling
+        \caption{The entanglement cooling process for gate sets that contain an $\text{iSWAP}$ gate. In this plot, all system sizes
+        are normalized to start the cooling process with the same amount of entanglement, and only differences in mean
+        entanglement are shown. The rate of disentangling
         is similar for different gate sets. Stated more precisely, the shapes of the curves of $\braket{S_{N_A}}$ match. The
         process of disentangling starts later for larger systems, however. In particular, disentangling fails for the
         universal gate set $\{\text{iSWAP},H,T\}$, whereas it succeeds for the other (non-universal) gate sets.}
@@ -311,7 +323,8 @@
     \end{equation}
 
     for appropriately chosen $C$, $\beta$, $A$. The spacing statistics of states from non-universal gate sets exhibit
-    a different distribution, more closely related to a Poisson-distribution.
+    a different distribution, more closely related to a Poisson-distribution. This holds true for gate sets containing
+    either $\text{iSWAP}$ or $\text{CNOT}$. See Figure~\ref{results:fig:level_spacing_head_CNOT}.
 
     \begin{figure}[htb]
         \includegraphics[width=\columnwidth]{plots/level_spacing_head_CNOT.pdf}
@@ -324,8 +337,41 @@
         \label{results:fig:level_spacing_head_CNOT}
     \end{figure}
 
-    \section{Outlook}
+    \section{Conclusion \& Outlook}
     \label{sec:outlook}
+
+    Our results demonstrate that the conflict between microscopically reversible dynamics and macroscop irreversibility
+    can be modelled with and found in Quantum Mechanics, specifically in the entanglement of chains of qubits. We demonstrated
+    that randomly generated circuits of single- and two-qubits gates consistently generate highly entangled states at the
+    same rate. Disentangling these states with a Metropolis-inspired algorithm only succeeds when the gate set used to
+    generate the state in question is not universal. The ability of a state to be disentangled is encoded in the distribution
+    of consecutive Schmidt coefficient spacings. For states that can be disentangled, these follow a Poisson-like
+    distribution. The spacings of states that cannot be disentangled follow the GOE distribution. This enables us to
+    treat Loschmidt's Paradox with the tools of Quantum Mechanics and Quantum Computing, thereby opening up avenues for
+    further investigation of the topic.
+
+    \vspace{\baselineskip}
+
+    The value in the method we presented lies in the fact that we are not limited to using statistical methods, as is
+    the case in thermodynamics and statistical physics. Our system of $N$ qubits has a comparably small amount of degrees
+    of freedom, and it's interaction with the environment we subject it to (i.e. the gates we apply) are very well understood
+    and can be easily and exactly simulable. Yet, even in such a controlled environment, we find irreversibility emerging
+    from reversible dynamics.
+
+    \vspace{\baselineskip}
+
+    There remain open questions. Consider for example the aforementioned result that $\text{iSWAP}$-sets create entanglement
+    at a rate slighly slower than $\text{CNOT}$-sets, and the fact that non-universal $\text{iSWAP}$-sets are unable to
+    remove all entanglement from the system. A more exact characterization of the rates at which entanglement
+    is created remains a topic for future work; specifically, if entanglement heating and cooling rates can be increased
+    or decreased depending on the set of gates that is used. A further open question concerns the observation that the
+    disentangling process starts later for larger systems, but progresses at the same rate once it has begun.
+
+    A further question that deserves more attention stems from wondering whether a $\text{CNOT}$-set can disentangle a state
+    that was created using an $\text{iSWAP}$-set, and vice-versa. Since the spacing statistics of $\text{CNOT}$-states
+    and $\text{iSWAP}$-states agree, one could expect the answer to be yes; then again, $\text{iSWAP}$-containing sets
+    cannot completely disentangle a state, but only partially. Put more broadly: In what capacity is the ability to be
+    disentangled a property of a quantum state, or of the gate set that is used?
 
     \bibliography{references}
 
@@ -338,6 +384,17 @@
         system size $N$. Cooling succeeds for the non-universal gate set $\{\text{CNOT},H,Z\}$, it fails however for the
         universal $\{\text{iSWAP},H,T\}$.}
         \label{results:fig:therm_examples}
+    \end{figure*}
+
+    \begin{figure*}[htb]
+        \includegraphics[width=\columnwidth]{plots/therm_{CNOT,H,Z}.pdf}
+        \includegraphics[width=\columnwidth]{plots/therm_{iSWAP,H,Z}.pdf}
+        \caption{Two examples of the thermalization of entanglement, i.e. the heating and cooling steps, for two
+        gate sets that only differ in which two-qubit gate they contain. The $\text{CNOT}$-containing set is able
+        to remove all entanglement from the state, while disentangling converges at a value $S\neq 0$ for
+        $\text{iSWAP}$-containing gate sets. Notice that the reamining entanglement scales linearly with the system
+        size, just as the maximum entanglement does.}
+        \label{results:fig:therm_CNOT_vs_iSWAP}
     \end{figure*}
 
     \appendix
