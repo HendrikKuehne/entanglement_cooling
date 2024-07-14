@@ -272,9 +272,8 @@
 
     \begin{figure}[htb]
         \includegraphics[width=\columnwidth]{plots/betatest_{CNOT,H,X}_CNOT.pdf}
-        \caption{We simulated entanglement cooling for $\beta\in [1,10]$ in a system of four qubits ($N=4$) and the gate
-        sets $\{\text{CNOT},H,X\}$, $\{\text{CNOT},H,S\}$ and $\{\text{CNOT},H,T\}$. There is no difference in the cooling
-        rate, as is shown above for one particular gate set.}
+        \caption{We simulated entanglement cooling for $\beta\in [1,10]$ in a system of four qubits ($N=4$). The temperature
+        $\beta$ has no influence on the cooling rate, as is shown above for one particular gate set.}
         \label{results:fig:betatest}
     \end{figure}
 
@@ -389,7 +388,7 @@
         \includegraphics[width=\columnwidth]{plots/therm_{iSWAP,H,Z}.pdf}
         \caption{Two examples of the thermalization of entanglement, i.e. the heating and cooling steps, for two
         gate sets that only differ in which two-qubit gate they contain. The $\text{CNOT}$-containing set is able
-        to remove all entanglement from the state, while disentangling converges at a value $S\neq 0$ for
+        to remove almost entanglement from the state, regardless of the system size. Disentangling converges at a value $S\neq 0$ for
         $\text{iSWAP}$-containing gate sets. Notice that the reamining entanglement scales linearly with the system
         size, just as the maximum entanglement does.}
         \label{results:fig:therm_CNOT_vs_iSWAP}
