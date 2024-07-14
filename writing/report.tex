@@ -286,17 +286,15 @@
     significant amount of entanglement, however, they cannot reduce $S$ back to zero. See
     Figure~\ref{results:fig:therm_CNOT_vs_iSWAP}.}; this is not the case, however. Specifically, entanglement cooling fails,
     whenever the gate set that is used is universal. Disentangling occurs at the same rate regardless of system
-    size $N$ and whether it succeeds or fails, for the same reason that entanglement heating occurs at the same rate.
+    size $N$ and whether it succeeds or fails, for the same reason that entanglement heating occurs at the same
+    rate\footnote{Stated more precisely, the shapes of the curves of $\braket{S_{N_A}}$ match. The process of disentangling
+    starts later for larger systems, however. Why this is remains an intriguing direction for future work.}.
     Disentangling begins later during the cooling process for larger systems. See also Figure~\ref{results:fig:therm_spped_iSWAP}.
 
     \begin{figure}[htb]
         \includegraphics[width=\columnwidth]{plots/therm_speed_iSWAP.pdf}
-        \caption{The entanglement cooling process for gate sets that contain an $\text{iSWAP}$ gate. In this plot, all system sizes
-        are normalized to start the cooling process with the same amount of entanglement, and only differences in mean
-        entanglement are shown. The rate of disentangling
-        is similar for different gate sets. Stated more precisely, the shapes of the curves of $\braket{S_{N_A}}$ match. The
-        process of disentangling starts later for larger systems, however. In particular, disentangling fails for the
-        universal gate set $\{\text{iSWAP},H,T\}$, whereas it succeeds for the other (non-universal) gate sets.}
+        \caption{The entanglement cooling process for gate sets that contain an $\text{iSWAP}$ gate. This plot only shows differences
+        in mean entanglement. The rate of disentangling is similar for different gate sets.}
         \label{results:fig:therm_spped_iSWAP}
     \end{figure}
 
