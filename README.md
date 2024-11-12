@@ -4,7 +4,7 @@ This repository contains code to simulate the entanglement and disentanglement o
 
 ## File contents
 
-* `diagnosis.ipynb`: Trying very hard to find out what specifically is wrong with my MSP implementation
+* `diagnosis.ipynb`: Trying very hard to find out what specifically is wrong with my MPS implementation
 * `plotting.ipynb`: Plotting routines
 * `simulator_MPS`: Simulating thermalization of MPS
 * `simulator_statevec`: Simulating thermalization of statevector
